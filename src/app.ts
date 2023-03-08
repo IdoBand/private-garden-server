@@ -1,36 +1,38 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
-import mongoose from 'mongoose';
-import { MongoClient } from 'mongodb';
+// import { connectToMongo } from './mongo/mongoClient';
+import {Dao} from './dao/PlantDao'
+import { upload } from './multerStorageConfig';
 
 const app = express();
-
+let PlantDao: Dao = new Dao();
 app.use(cors());
 app.use(express.json())
 
-const url = 'mongodb://localhost:27017/?authMechanism=DEFAULT'
-const DBname = 'private-garden-db'
+app.post('/addPlant', upload.single('plantImage'), async (req: Request, res: Response) => {
+  try {
+    await PlantDao.addPlant(req.body.plantName, req.file.originalname)
+    res.status(200).send('Plant was saved successfully!')
+  } catch (err){
+    res.status(400).send('Failed to save plant.')
+  }
+})
 
-// async function connectToMongo() {
-//         const client = new MongoClient(url);
-//         await client.connect()
-//             .then(() => console.log('successfully connected to Mongo'))
-//             .catch(e => console.log(e))
- 
-// }
-let dbConnection
-function connectToMongo() {
-    MongoClient.connect(url)
-    .then(client => {
-        dbConnection = client.db()
-    })
-    .catch(err => console.log(err))
+app.get('/getEntireGarden', async (req: Request, res: Response) => {
+  try {
+    const entireGarden = await PlantDao.getEntireGarden()
+    res.status(200).json(entireGarden)
+} catch (err) {
+  res.status(400).send('Failed to get entire garden.')
 }
+})
 
-connectToMongo()
-
-
-const port = 8000;
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Server is running at port ${port}`);
-});
+app.get('/removePlant', async (req: Request, res: Response) => {
+  try {
+    await PlantDao.removePlant(req.query.id as string)
+    res.status(200).send('Plant was removed successfully!')
+} catch (err) {
+    res.status(400).send('Failed to remove plant.')
+}
+})
+export default app;
