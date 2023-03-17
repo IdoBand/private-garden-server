@@ -1,44 +1,27 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { PlantModel } from '../models';
 import fs from 'fs'
+import { AbstractDao } from "./AbstractDao"
+export class PlantDao extends AbstractDao{
 
-export class Dao {
-    db: string
-    schema: any
+    model: any
     constructor() {
-        this.db = 'private-garden'
-        this.connectToMongoose()
-        this.schema = PlantModel
+        super()
+        this.model = PlantModel
     }
-    async connectToMongoose() {
-        try {
-            await mongoose.connect(`mongodb://127.0.0.1:27017/${this.db}`)
-            console.log('Mongoose connection successful!')
-          } catch (err) {
-            console.log('Could not connect to Mongo' + err)
-          }
-    }
-    dateValidator(date?: string | null) {
-        if (date) {return date}
-        const newDate = new Date(); 
-        const options = {day: '2-digit', month: '2-digit', year: 'numeric'} as const;
-        const dateString = newDate.toLocaleDateString('en-US', options);
-        return dateString;
-      }
+
     async addPlant(name: string, imageName: string) {
+        console.log('trying to save plant');
+        const img = this.deicideImage(imageName)
         const savePlant = new PlantModel({
             plantName: name,
-            irrigations: [],
             dateAdded: this.dateValidator(),
-            img: {
-              data: fs.readFileSync(`${process.cwd()}/images/` + imageName),
-              contentType: 'image/jpg'}
-            })
+            img: img})
         try {
             await savePlant.save()
-            console.log('image was successfully saved!')
+            console.log('Plant was successfully saved!')
         }catch(err) {
-                console.log('could not save image' + err)
+            console.log('could not save image' + err)
             }
          
     }
@@ -49,47 +32,32 @@ export class Dao {
             console.log('Failed to get entire garden.' + err)
         }
     }
-    async removePlant(id: string) {
+    async removePlants(idsArray: string[]) {
         try {
-            await PlantModel.findByIdAndDelete({_id: id})
-        } catch(err) {
-            console.log('Failed to remove plant.' + err)
+            await PlantModel.deleteMany({_id: {$in: idsArray}})
+        } catch (err) {
+            console.log(`Failed to remove plant` + err)
         }
     }
-    async editPlant(){
-        return
+    async editPlant(plantId: string, newInfoObject){
+        if (!newInfoObject.plantName) {
+            delete newInfoObject.plantName
+        }
+        if (!newInfoObject.img) {
+            delete newInfoObject.img
+        } else {
+            const img = {
+                data: fs.readFileSync(`${process.cwd()}/images/` + newInfoObject.img),
+                contentType: 'image/jpg'}
+            newInfoObject.img = img
+        }
+        try {
+            const response = await PlantModel.findByIdAndUpdate(
+                plantId,
+                newInfoObject
+                )
+        } catch (err) {
+            console.log('Failed to update plant.' + err)
+        }
     }
 }
-
-////////////     O L D    D A O
-// import { MongoClient } from "mongodb";
-// import dbClient from "../mongo/mongoClient";
-// const DBname = 'private-garden-db';
-
-
-// export class Dao {
-//     client: MongoClient;
-//     db: any
-//     collection: any
-//     constructor() {
-//         this.client = dbClient();
-//         this.db = this.client.db(DBname)
-//         this.collection = this.db.collection('plants')
-//     }
-//     async addPlant(name: string, image: File | Express.Multer.File) {
-//         const newPlant = {
-//             name: name,
-//             dateAdded: '',
-//             irrigations: [],
-//             mainImage: image
-//         }
-//         try {
-//             const result = await this.collection.insertOne(newPlant)
-//             return result
-//         }catch(err) {
-//                 console.log(err)
-//             }
-         
-//     }
-  
-// }
