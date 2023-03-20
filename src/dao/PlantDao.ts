@@ -2,7 +2,7 @@ import mongoose, { Model } from "mongoose";
 import { PlantModel } from '../models';
 import fs from 'fs'
 import { AbstractDao } from "./AbstractDao"
-export class PlantDao extends AbstractDao{
+export class PlantDao extends AbstractDao {
 
     model: any
     constructor() {
@@ -12,11 +12,10 @@ export class PlantDao extends AbstractDao{
 
     async addPlant(name: string, imageName: string) {
         console.log('trying to save plant');
-        const img = this.deicideImage(imageName)
         const savePlant = new PlantModel({
             plantName: name,
             dateAdded: this.dateValidator(),
-            img: img})
+            img: this.deicideImage(imageName)})
         try {
             await savePlant.save()
             console.log('Plant was successfully saved!')

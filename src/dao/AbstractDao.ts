@@ -7,13 +7,10 @@ export abstract class AbstractDao {
         const dateString = newDate.toLocaleDateString('en-US', options);
         return dateString;
     }
-   
-    deicideImage(imageName: string | undefined) {
-        if (imageName) {
-            return {
-                data: fs.readFileSync(`${process.cwd()}/images/` + imageName),
-                contentType: 'image/jpg'}
-        }
-        return 'no image was uploaded'
+    deicideImage(imageName: string) {
+        return {
+            data: fs.readFileSync(`${process.cwd()}/images/` + imageName),
+            contentType: 'image/jpg'}
     }
+
 }
