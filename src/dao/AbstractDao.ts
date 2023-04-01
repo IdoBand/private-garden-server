@@ -8,9 +8,15 @@ export abstract class AbstractDao {
         return dateString;
     }
     deicideImage(imageName: string) {
+        if (imageName) {
+            return {
+                data: fs.readFileSync(`${process.cwd()}/images/` + imageName),
+                contentType: 'image/jpg'}
+        }
         return {
-            data: fs.readFileSync(`${process.cwd()}/images/` + imageName),
-            contentType: 'image/jpg'}
+            data: [],
+            contentType: ''}
     }
-
 }
+
+

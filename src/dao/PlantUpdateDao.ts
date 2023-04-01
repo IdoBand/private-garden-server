@@ -9,14 +9,14 @@ export class PlantUpdateDao extends AbstractDao{
         super()
         this.model = PlantUpdateModel
     }
-    async addUpdate(dateAdded: string , plantId: string, plantName: string, imageName: string | undefined, irrigation: boolean, 
+    async addUpdate(dateAdded: string , plantId: string, plantName: string, imageName: string, irrigation: boolean, 
                     waterQuantity: number, fertilizer: string, fertilizerQuantity: number, 
                     notes: string){
         const date = this.dateValidator(dateAdded)
-        console.log(typeof(irrigation));
-        
         const irrigationProperties = this.deicideIrrigation(irrigation, waterQuantity, fertilizer, fertilizerQuantity)
         const img = this.deicideImage(imageName)
+        console.log(`this is ---- ${img} ---`);
+        
         const saveUpdate = new PlantUpdateModel({
             plantId: plantId,
             plantName: plantName,
@@ -46,14 +46,6 @@ export class PlantUpdateDao extends AbstractDao{
             }
     
     }
-    // deicideImage(imageName: string) {
-    //     if (imageName) {
-    //         return {
-    //             data: fs.readFileSync(`${process.cwd()}/images/` + imageName),
-    //             contentType: 'image/jpg'}
-    //     }
-    //     return 'no image was uploaded'
-    // }
     async getAllUpdatesByPlantId(plantId: string) {
         try {
             const updates = await PlantUpdateModel.find({ plantId: plantId });

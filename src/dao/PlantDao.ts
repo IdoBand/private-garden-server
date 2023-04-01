@@ -45,6 +45,8 @@ export class PlantDao extends AbstractDao {
         if (!newInfoObject.img) {
             delete newInfoObject.img
         } else {
+            console.log(newInfoObject);
+            
             const img = {
                 data: fs.readFileSync(`${process.cwd()}/images/` + newInfoObject.img),
                 contentType: 'image/jpg'}
@@ -55,6 +57,7 @@ export class PlantDao extends AbstractDao {
                 plantId,
                 newInfoObject
                 )
+                return response
         } catch (err) {
             console.log('Failed to update plant.' + err)
         }

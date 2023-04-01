@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { connectToMongo } from './mongo/mongooseConnection'
-import {PlantDao} from './dao/plantDao'
+import {PlantDao} from './dao/PlantDao'
 import { PlantUpdateDao } from './dao/PlantUpdateDao'
 import { upload } from './multerStorageConfig';
 import bodyParser from 'body-parser';
@@ -33,7 +33,7 @@ app.post('/addPlantUpdate', upload.single('updateImage'), async (req: Request, r
     newUpdateId: ''
   }
 
-  let imageOriginalName = 'logo.jpg';
+  let imageOriginalName = '';
   if (req.file) {
     imageOriginalName = req.file.originalname
   }
@@ -70,7 +70,7 @@ app.get('/getAllUpdatesByPlantId', async (req: Request, res: Response) => {
 
 ///////////////////       P L A N T    D A O        ///////////////////
 app.post('/addPlant', upload.single('plantImage'), async (req: Request, res: Response) => {
-  let imageOriginalName = 'logo.jpg';
+  let imageOriginalName = '';
   if (req.file) {
     imageOriginalName = req.file.originalname
   }
@@ -99,15 +99,24 @@ app.post('/removePlants', async (req: Request, res: Response) => {
     res.status(400).send(JSON.stringify({message: 'Failed to remove plant.'}))
 }
 })
+/////////   N O T    F I N I S H E D
 app.post('/editPlantById', upload.single('plantImage'), async (req: Request, res: Response) => {
-  let img = undefined;
-  if (req.file) { img = req.file.originalname}
-  const plantId = req.body.id
+  let imageOriginalName = '';
+  if (req.file) {
+    console.log(req.file);
+    
+    imageOriginalName = req.file.originalname
+  }
+  
+  
+  const plantId = req.body.plantId
   const newInfo = {plantName: req.body.plantName,
-                    img}
+                  img: imageOriginalName}
+                    console.log(plantId, newInfo);
+                    
   try {
       await plantDao.editPlant(plantId, newInfo)
-      res.status(200).send(JSON.stringify({message: 'Plant was updated successfully'}))
+      res.status(200).send(JSON.stringify({message: 'Plant was updated successfully!'}))
   } catch (err) {
     res.status(400).send(JSON.stringify({message: 'Failed to edit plant.'}))
 }
@@ -116,19 +125,23 @@ app.post('/editPlantById', upload.single('plantImage'), async (req: Request, res
 
 ///////////////////        P l @ n t    N e t        ///////////////////
 
-app.post('/IdentifyPlant', upload.single('plantImage'), async (req: Request, res: Response) => {
-  let imageOriginalName: string = 'logo.jpg';
-  if (req.file) {
-    imageOriginalName = req.file.originalname
-  }
-  
-  
-  
-  try {
-    const responseObject = await planetNetDao.fetchIdentifyPlantPost(imageOriginalName)
-    res.send(JSON.stringify({message: responseObject.bestMatch}))
-  } catch (err) {
+app.post('/IdentifyPlant', upload.array('plantImages'), async (req: Request, res: Response) => {
+    let originalImageNames: string[] = []
+    if (req.files) {
+      const files = req.files as Express.Multer.File[];
+      for (let i = 0; i < files.length; i++) {
+      originalImageNames.push(files[i].originalname)
+      }
+
+    try {
+      const responseObject = await planetNetDao.fetchIdentifyPlantPost(originalImageNames)
+      res.send(JSON.stringify({message: responseObject.bestMatch}))
+    } catch (err) {
+        const errorMessage = 'Failed to identify'
+        console.log(errorMessage + err);
+        res.send(JSON.stringify({message: errorMessage}))
+    }
+    }
     
-}
-})
+  })
 export default app;
