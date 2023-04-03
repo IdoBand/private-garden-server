@@ -16,6 +16,8 @@ export class PlantDao extends AbstractDao {
             plantName: name,
             dateAdded: this.dateValidator(),
             img: this.deicideImage(imageName)})
+            console.log(`savePlant: ${savePlant}`);
+            
         try {
             await savePlant.save()
             console.log('Plant was successfully saved!')
@@ -45,11 +47,7 @@ export class PlantDao extends AbstractDao {
         if (!newInfoObject.img) {
             delete newInfoObject.img
         } else {
-            console.log(newInfoObject);
-            
-            const img = {
-                data: fs.readFileSync(`${process.cwd()}/images/` + newInfoObject.img),
-                contentType: 'image/jpg'}
+            const img = this.deicideImage(newInfoObject.img)
             newInfoObject.img = img
         }
         try {
@@ -57,6 +55,8 @@ export class PlantDao extends AbstractDao {
                 plantId,
                 newInfoObject
                 )
+                console.log(response);
+                
                 return response
         } catch (err) {
             console.log('Failed to update plant.' + err)

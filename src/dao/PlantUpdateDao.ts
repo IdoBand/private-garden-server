@@ -9,13 +9,12 @@ export class PlantUpdateDao extends AbstractDao{
         super()
         this.model = PlantUpdateModel
     }
-    async addUpdate(dateAdded: string , plantId: string, plantName: string, imageName: string, irrigation: boolean, 
+    async addUpdate(dateAdded: string , plantId: string, plantName: string, imageName: string, irrigation: string, 
                     waterQuantity: number, fertilizer: string, fertilizerQuantity: number, 
                     notes: string){
         const date = this.dateValidator(dateAdded)
         const irrigationProperties = this.deicideIrrigation(irrigation, waterQuantity, fertilizer, fertilizerQuantity)
         const img = this.deicideImage(imageName)
-        console.log(`this is ---- ${img} ---`);
         
         const saveUpdate = new PlantUpdateModel({
             plantId: plantId,
@@ -33,7 +32,7 @@ export class PlantUpdateDao extends AbstractDao{
             console.log('oopsi poopsi' + err)
         }
     }
-    deicideIrrigation(irrigation, waterQuantity, fertilizer, fertilizerQuantity) {
+    deicideIrrigation(irrigation: string, waterQuantity: number, fertilizer: string, fertilizerQuantity: number) {
         // since the request is 'content-type: form-data'
         if (irrigation === 'false') { 
            return { boolean: false }
@@ -54,5 +53,27 @@ export class PlantUpdateDao extends AbstractDao{
             console.log('Failed to get all updates.' + err)
         }
     }
-    
+    async removeUpdates(idsArray: string[]) {
+        try {
+            const response = await PlantUpdateModel.deleteMany({_id: {$in: idsArray}})
+            console.log(response)
+        } catch (err) {
+            console.log('Failed to remove some or all updates.' + err)
+        }
+    }
+    async editUpdateById(updateId: string, newInfo) {
+        console.log(`edit update, updateId: updateId`);
+        
+        try {
+            console.log('trying to save update', newInfo);
+            
+            const response = await PlantUpdateModel.findByIdAndUpdate(
+                updateId,
+                newInfo
+            )
+            console.log(`response from trying to save: ${response}`)
+        } catch (err) {
+            console.log('Failed to remove some or all updates.' + err)
+        }
+    }
 }

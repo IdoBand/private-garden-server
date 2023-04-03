@@ -68,6 +68,39 @@ app.get('/getAllUpdatesByPlantId', async (req: Request, res: Response) => {
 }
 })
 
+app.post('/editPlantUpdate', upload.single('updateImage'), async (req: Request, res: Response) => {
+  let imageOriginalName = '';
+  if (req.file) {
+    imageOriginalName = req.file.originalname
+  }
+  const newInfo = {
+    plantId: req.body.plantId,
+    plantName: req.body.plantName,
+    dateAdded: req.body.date,
+    img: updateDao.deicideImage(imageOriginalName),
+    irrigation: updateDao.deicideIrrigation(
+      req.body.irrigationBoolean,
+      +req.body.waterQuantity,
+      req.body.fertilizer,
+      +req.body.fertilizerQuantity,
+    ),
+    notes: req.body.notes,
+  }
+  try {
+    await updateDao.editUpdateById(req.body.updateId, newInfo)
+    res.status(200).send(JSON.stringify({message: 'Plant update was successfully updated!'}))
+} catch (err) {
+    res.status(400).send(JSON.stringify({message: 'Failed to remove plant.'}))
+}
+})
+app.post('/removeUpdates', async (req: Request, res: Response) => {
+  try {
+    await updateDao.removeUpdates(req.body.IdsToRemove)
+    res.status(200).send(JSON.stringify({message: 'Updates were removed successfully!'}))
+} catch (err) {
+    res.status(400).send(JSON.stringify({message: 'Failed to remove plant.'}))
+}
+})
 ///////////////////       P L A N T    D A O        ///////////////////
 app.post('/addPlant', upload.single('plantImage'), async (req: Request, res: Response) => {
   let imageOriginalName = '';
@@ -87,7 +120,7 @@ app.get('/getEntireGarden', async (req: Request, res: Response) => {
     const entireGarden = await plantDao.getEntireGarden()
     res.status(200).json(entireGarden)
 } catch (err) {
-  res.status(400).send(JSON.stringify({message: 'Failed to get entire garden.'}))
+    res.status(400).send(JSON.stringify({message: 'Failed to get entire garden.'}))
 }
 })
 
@@ -99,12 +132,10 @@ app.post('/removePlants', async (req: Request, res: Response) => {
     res.status(400).send(JSON.stringify({message: 'Failed to remove plant.'}))
 }
 })
-/////////   N O T    F I N I S H E D
+
 app.post('/editPlantById', upload.single('plantImage'), async (req: Request, res: Response) => {
   let imageOriginalName = '';
   if (req.file) {
-    console.log(req.file);
-    
     imageOriginalName = req.file.originalname
   }
   
@@ -112,7 +143,7 @@ app.post('/editPlantById', upload.single('plantImage'), async (req: Request, res
   const plantId = req.body.plantId
   const newInfo = {plantName: req.body.plantName,
                   img: imageOriginalName}
-                    console.log(plantId, newInfo);
+                    console.log('newInfo :',plantId, newInfo);
                     
   try {
       await plantDao.editPlant(plantId, newInfo)
