@@ -1,6 +1,5 @@
 import mongoose, { Model } from "mongoose";
 import { PlantModel } from '../models';
-import fs from 'fs'
 import { AbstractDao } from "./AbstractDao"
 export class PlantDao extends AbstractDao {
 
@@ -17,13 +16,13 @@ export class PlantDao extends AbstractDao {
             dateAdded: this.dateValidator(),
             img: this.deicideImage(imageName)})
             console.log(`savePlant: ${savePlant}`);
-            
         try {
             await savePlant.save()
             console.log('Plant was successfully saved!')
         }catch(err) {
             console.log('could not save image' + err)
-            }
+            throw err
+        }
          
     }
     async getEntireGarden() {
@@ -31,6 +30,7 @@ export class PlantDao extends AbstractDao {
             return await PlantModel.find()
         } catch (err) {
             console.log('Failed to get entire garden.' + err)
+            throw err
         }
     }
     async removePlants(idsArray: string[]) {
@@ -38,6 +38,7 @@ export class PlantDao extends AbstractDao {
             await PlantModel.deleteMany({_id: {$in: idsArray}})
         } catch (err) {
             console.log(`Failed to remove plant` + err)
+            throw err
         }
     }
     async editPlant(plantId: string, newInfoObject){
@@ -55,11 +56,10 @@ export class PlantDao extends AbstractDao {
                 plantId,
                 newInfoObject
                 )
-                console.log(response);
-                
                 return response
         } catch (err) {
-            console.log('Failed to update plant.' + err)
+            console.log('Failed to update plant. ' + err)
+            throw err
         }
     }
 }

@@ -134,20 +134,17 @@ app.post('/removePlants', async (req: Request, res: Response) => {
 })
 
 app.post('/editPlantById', upload.single('plantImage'), async (req: Request, res: Response) => {
-  let imageOriginalName = '';
-  if (req.file) {
-    imageOriginalName = req.file.originalname
-  }
-  
-  
-  const plantId = req.body.plantId
-  const newInfo = {plantName: req.body.plantName,
-                  img: imageOriginalName}
-                    console.log('newInfo :',plantId, newInfo);
-                    
   try {
-      await plantDao.editPlant(plantId, newInfo)
-      res.status(200).send(JSON.stringify({message: 'Plant was updated successfully!'}))
+    let imageOriginalName = '';
+    if (req.file) {
+      imageOriginalName = req.file.originalname
+    }
+    const plantId = req.body.plantId
+    const newInfo = {plantName: req.body.plantName,
+                    img: imageOriginalName}
+  
+    const result = await plantDao.editPlant(plantId, newInfo)
+    res.status(200).send(JSON.stringify({message: 'Plant was updated successfully!'}))
   } catch (err) {
     res.status(400).send(JSON.stringify({message: 'Failed to edit plant.'}))
 }

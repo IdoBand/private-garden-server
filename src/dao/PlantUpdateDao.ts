@@ -30,6 +30,7 @@ export class PlantUpdateDao extends AbstractDao{
             return result._id.toString()
         } catch (err){
             console.log('oopsi poopsi' + err)
+            throw err
         }
     }
     deicideIrrigation(irrigation: string, waterQuantity: number, fertilizer: string, fertilizerQuantity: number) {
@@ -51,6 +52,7 @@ export class PlantUpdateDao extends AbstractDao{
             return updates
         }catch(err) {
             console.log('Failed to get all updates.' + err)
+            throw err
         }
     }
     async removeUpdates(idsArray: string[]) {
@@ -59,11 +61,11 @@ export class PlantUpdateDao extends AbstractDao{
             console.log(response)
         } catch (err) {
             console.log('Failed to remove some or all updates.' + err)
+            throw err
         }
     }
     async editUpdateById(updateId: string, newInfo) {
         console.log(`edit update, updateId: updateId`);
-        
         try {
             console.log('trying to save update', newInfo);
             
@@ -74,6 +76,7 @@ export class PlantUpdateDao extends AbstractDao{
             console.log(`response from trying to save: ${response}`)
         } catch (err) {
             console.log('Failed to remove some or all updates.' + err)
+            throw err
         }
     }
 }

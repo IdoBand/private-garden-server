@@ -10,7 +10,8 @@ export class PlanetNetDao extends AbstractDao{
         this.#API_KEY = '2b104d0VgwbnHr9rmWZYm6Bu'
     }
     async fetchIdentifyPlantPost(originalImageNames: string[]) {
-        const formData = new FormData()
+        try {
+            const formData = new FormData()
         for (let i = 0 ; i < originalImageNames.length ; i++) {
             const imageFile = fs.readFileSync(`${process.cwd()}/images/` + originalImageNames[i])
             const blob = new Blob([imageFile], { type: 'image/jpeg' })
@@ -21,7 +22,11 @@ export class PlanetNetDao extends AbstractDao{
             body: formData})
         
         const res = await response.json()
-        console.log('this issssss',res);
         return res
+        } catch (err) {
+            console.log('Something went wrong, ' + err)
+            throw err
+        }
+        
     }
 }
