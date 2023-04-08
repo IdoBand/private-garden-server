@@ -29,7 +29,7 @@ export class PlantUpdateDao extends AbstractDao{
             console.log('Document saved successfully:');
             return result._id.toString()
         } catch (err){
-            console.log('oopsi poopsi' + err)
+            console.log('Failed to save new update' + err)
             throw err
         }
     }
@@ -65,10 +65,7 @@ export class PlantUpdateDao extends AbstractDao{
         }
     }
     async editUpdateById(updateId: string, newInfo) {
-        console.log(`edit update, updateId: updateId`);
         try {
-            console.log('trying to save update', newInfo);
-            
             const response = await PlantUpdateModel.findByIdAndUpdate(
                 updateId,
                 newInfo

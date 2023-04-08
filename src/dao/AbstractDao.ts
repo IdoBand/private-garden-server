@@ -9,9 +9,18 @@ export abstract class AbstractDao {
     }
     deicideImage(imageName: string) {
         if (imageName) {
-            return {
-                data: fs.readFileSync(`${process.cwd()}/images/` + imageName),
-                contentType: 'image/jpg'}
+            try {
+                const img = {
+                    data: fs.readFileSync(`${process.cwd()}/images/` + imageName),
+                    contentType: 'image/jpg'
+                }
+                fs.unlink(`${process.cwd()}/images/` + imageName, (err) => {
+                    console.log('Image file deletion has failed' + err);
+                })
+                return img
+            } catch (err) {
+                console.log('Image saving process has failed' + err);
+            }
         }
         return {
             data: [],

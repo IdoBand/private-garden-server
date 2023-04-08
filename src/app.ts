@@ -108,8 +108,11 @@ app.post('/addPlant', upload.single('plantImage'), async (req: Request, res: Res
     imageOriginalName = req.file.originalname
   }
   try {
-    await plantDao.addPlant(req.body.plantName, imageOriginalName)
-    res.status(200).send(JSON.stringify({message: 'Plant was saved successfully!'}))
+    const result = await plantDao.addPlant(req.body.plantName, imageOriginalName)
+    const response = {message: 'Plant was saved successfully!',
+                      plantId: result._id}
+    
+    res.status(200).send(JSON.stringify(response))
   } catch (err){
     res.status(400).send(JSON.stringify({message: 'Failed to save plant.'}))
   }

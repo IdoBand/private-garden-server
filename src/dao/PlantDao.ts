@@ -10,15 +10,14 @@ export class PlantDao extends AbstractDao {
     }
 
     async addPlant(name: string, imageName: string) {
-        console.log('trying to save plant');
         const savePlant = new PlantModel({
             plantName: name,
             dateAdded: this.dateValidator(),
             img: this.deicideImage(imageName)})
-            console.log(`savePlant: ${savePlant}`);
         try {
-            await savePlant.save()
+            const result = await savePlant.save()
             console.log('Plant was successfully saved!')
+            return result
         }catch(err) {
             console.log('could not save image' + err)
             throw err
