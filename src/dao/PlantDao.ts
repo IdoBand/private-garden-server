@@ -32,6 +32,15 @@ export class PlantDao extends AbstractDao {
             throw err
         }
     }
+    async getPlantById(plantId: string) {
+        try {
+            const plant = await PlantModel.findById(plantId)
+            return plant
+        } catch (err) {
+            console.log(`Failed to get plant ${plantId}.` + err)
+            throw err
+        }
+    }
     async removePlants(idsArray: string[]) {
         try {
             await PlantModel.deleteMany({_id: {$in: idsArray}})

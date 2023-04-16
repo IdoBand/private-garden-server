@@ -58,7 +58,6 @@ export class PlantUpdateDao extends AbstractDao{
     async removeUpdates(idsArray: string[]) {
         try {
             const response = await PlantUpdateModel.deleteMany({_id: {$in: idsArray}})
-            console.log(response)
         } catch (err) {
             console.log('Failed to remove some or all updates.' + err)
             throw err
@@ -70,7 +69,6 @@ export class PlantUpdateDao extends AbstractDao{
                 updateId,
                 newInfo
             )
-            console.log(`response from trying to save: ${response}`)
         } catch (err) {
             console.log('Failed to remove some or all updates.' + err)
             throw err

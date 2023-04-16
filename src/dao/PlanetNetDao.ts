@@ -1,5 +1,4 @@
 import { AbstractDao } from "./AbstractDao";
-import fs from 'fs'
 
 export class PlanetNetDao extends AbstractDao{
     readonly basicURL: string
@@ -13,9 +12,10 @@ export class PlanetNetDao extends AbstractDao{
         try {
             const formData = new FormData()
         for (let i = 0 ; i < originalImageNames.length ; i++) {
-            const imageFile = fs.readFileSync(`${process.cwd()}/images/` + originalImageNames[i])
+            const imageFile = this.fsReadFileSync(originalImageNames[i])
             const blob = new Blob([imageFile], { type: 'image/jpeg' })
             formData.append('images', blob)
+            this.removeImageFromStorage(originalImageNames[i])
         }
         const response = await fetch (`${this.basicURL}/v2/identify/all?include-related-images=true&no-reject=false&lang=en&api-key=${this.#API_KEY}`, 
             {method: 'POST',

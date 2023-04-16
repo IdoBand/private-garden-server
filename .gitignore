@@ -6,6 +6,7 @@ dist-ssr
 ideas.txt
 /ideas
 ideas
+.env
 
 # Editor directories and files
 .vscode/*

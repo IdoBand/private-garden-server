@@ -126,6 +126,14 @@ app.get('/getEntireGarden', async (req: Request, res: Response) => {
     res.status(400).send(JSON.stringify({message: 'Failed to get entire garden.'}))
 }
 })
+app.get('/plant/:id', async (req: Request, res: Response) => {
+  try {
+    const plant = await plantDao.getPlantById(req.params.id)
+    res.status(200).json(plant)
+} catch (err) {
+    res.status(400).send(JSON.stringify({message: 'Failed to get plant. Url or plant id might be incorrect.'}))
+}
+})
 
 app.post('/removePlants', async (req: Request, res: Response) => {
   try {
@@ -137,11 +145,12 @@ app.post('/removePlants', async (req: Request, res: Response) => {
 })
 
 app.post('/editPlantById', upload.single('plantImage'), async (req: Request, res: Response) => {
+  let imageOriginalName = '';
+  if (req.file) {
+    imageOriginalName = req.file.originalname
+  }
   try {
-    let imageOriginalName = '';
-    if (req.file) {
-      imageOriginalName = req.file.originalname
-    }
+
     const plantId = req.body.plantId
     const newInfo = {plantName: req.body.plantName,
                     img: imageOriginalName}
