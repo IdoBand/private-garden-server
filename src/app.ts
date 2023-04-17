@@ -23,7 +23,7 @@ app.use(cors());
 app.use(bodyParser.json())
 /////////////
 app.get('test', (req: Request, res: Response) => {
-  res.send('hi')})
+  res.send('/hi')})
 
 ///////////////////       U P D A T E    D A O        ///////////////////
 app.post('/addPlantUpdate', upload.single('updateImage'), async (req: Request, res: Response) => {
