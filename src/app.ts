@@ -13,10 +13,10 @@ let updateDao: PlantUpdateDao
 let plantDao: PlantDao
 let planetNetDao: PlanetNetDao
 export async function initiateApp() {
-  // await connectToMongo()
-  // plantDao = new PlantDao()
-  // updateDao = new PlantUpdateDao()
-  // planetNetDao = new PlanetNetDao() 
+  await connectToMongo()
+  plantDao = new PlantDao()
+  updateDao = new PlantUpdateDao()
+  planetNetDao = new PlanetNetDao() 
 }
 
 app.use(cors());

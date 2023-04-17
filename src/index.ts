@@ -2,7 +2,7 @@ import app from './app'
 import { initiateApp } from './app';
 
 async function main() {
-    // await initiateApp();
+    await initiateApp();
 
     const port = process.env.PORT || 8000;
     app.listen(port, () => {
