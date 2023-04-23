@@ -27,7 +27,7 @@ app.get('test', (req: Request, res: Response) => {
 
 ///////////////////       U P D A T E    D A O        ///////////////////
 app.post('/addPlantUpdate', upload.single('updateImage'), async (req: Request, res: Response) => {
-  const responseObject = {
+  let responseObject = {
     message: '',
     code: 200,
     newUpdateId: ''
@@ -166,7 +166,7 @@ app.post('/editPlantById', upload.single('plantImage'), async (req: Request, res
 ///////////////////        P l @ n t    N e t        ///////////////////
 
 app.post('/IdentifyPlant', upload.array('plantImages'), async (req: Request, res: Response) => {
-    const originalImageNames: string[] = []
+    let originalImageNames: string[] = []
     if (req.files) {
       const files = req.files as Express.Multer.File[];
       for (let i = 0; i < files.length; i++) {
