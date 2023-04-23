@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Application } from 'express';
 import cors from 'cors';
 import { connectToMongo } from './mongo/mongooseConnection'
 import {PlantDao} from './dao/PlantDao'
@@ -6,9 +6,11 @@ import { PlantUpdateDao } from './dao/PlantUpdateDao'
 import { upload } from './multerStorageConfig';
 import bodyParser from 'body-parser';
 import { PlanetNetDao } from './dao/PlanetNetDao';
-
-const app = express();
-
+interface ExpressWithKeepAliveTimeout extends Application {
+  keepAliveTimeout?: number
+}
+const app: ExpressWithKeepAliveTimeout = express()
+app.keepAliveTimeout = 60000;
 let updateDao: PlantUpdateDao
 let plantDao: PlantDao
 let planetNetDao: PlanetNetDao
