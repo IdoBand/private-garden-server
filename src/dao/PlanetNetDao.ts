@@ -1,4 +1,3 @@
-import axios from "axios";
 import { AbstractDao } from "./AbstractDao";
 
 export class PlanetNetDao extends AbstractDao{
@@ -18,11 +17,13 @@ export class PlanetNetDao extends AbstractDao{
             formData.append('images', blob)
             this.removeImageFromStorage(originalImageNames[i])
         }
-        // const response = await fetch (`${this.basicURL}/v2/identify/all?include-related-images=true&no-reject=false&lang=en&api-key=${this.#API_KEY}`, 
-        //     {method: 'POST',
-        //     body: formData})
-        const response = await axios.post(`${this.basicURL}/v2/identify/all?include-related-images=true&no-reject=false&lang=en&api-key=${this.#API_KEY}`, formData)
-        return response.data
+        const response = await fetch (`${this.basicURL}/v2/identify/all?include-related-images=true&no-reject=false&lang=en&api-key=${this.#API_KEY}`, 
+            {method: 'POST',
+            body: formData})
+        const res = await response.json()
+        console.log(res);
+        
+        return res
         } catch (err) {
             console.log('Something went wrong, ' + err)
             throw err
