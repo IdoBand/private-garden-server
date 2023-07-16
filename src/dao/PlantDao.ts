@@ -1,5 +1,6 @@
 import { PlantModel } from '../models';
 import { AbstractDao } from "./AbstractDao"
+import { PlantEdit } from 'src/types';
 export class PlantDao extends AbstractDao {
 
     model: typeof PlantModel
@@ -48,14 +49,14 @@ export class PlantDao extends AbstractDao {
             throw err
         }
     }
-    async editPlant(plantId: string, newInfoObject){
+    async editPlant(plantId: string, newInfoObject: PlantEdit){
         if (!newInfoObject.plantName) {
             delete newInfoObject.plantName
         }
         if (!newInfoObject.img) {
             delete newInfoObject.img
         } else {
-            const img = this.deicideImage(newInfoObject.img)
+            const img = this.deicideImage(newInfoObject.img as string)
             newInfoObject.img = img
         }
         try {

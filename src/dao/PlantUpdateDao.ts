@@ -1,3 +1,4 @@
+import { Irrigation, PlantUpdate } from 'src/types';
 import { PlantUpdateModel } from '../models';
 import { AbstractDao } from "./AbstractDao";
 
@@ -31,7 +32,7 @@ export class PlantUpdateDao extends AbstractDao{
             throw err
         }
     }
-    deicideIrrigation(irrigation: string, waterQuantity: number, fertilizer: string, fertilizerQuantity: number) {
+    deicideIrrigation(irrigation: string, waterQuantity: number, fertilizer: string, fertilizerQuantity: number): Irrigation {
         // since the request is 'content-type: form-data'
         if (irrigation === 'false') { 
            return { boolean: false }
@@ -62,7 +63,7 @@ export class PlantUpdateDao extends AbstractDao{
             throw err
         }
     }
-    async editUpdateById(updateId: string, newInfo) {
+    async editUpdateById(updateId: string, newInfo: PlantUpdate) {
         try {
             const response = await PlantUpdateModel.findByIdAndUpdate(
                 updateId,

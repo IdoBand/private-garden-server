@@ -6,6 +6,7 @@ import { PlantUpdateDao } from './dao/PlantUpdateDao'
 import { upload } from './multerStorageConfig';
 import bodyParser from 'body-parser';
 import { PlanetNetDao } from './dao/PlanetNetDao';
+import { PlantUpdate } from './types';
 
 const app = express()
 
@@ -73,7 +74,7 @@ app.post('/editPlantUpdate', upload.single('updateImage'), async (req: Request, 
   if (req.file) {
     imageOriginalName = req.file.originalname
   }
-  const newInfo = {
+  const newInfo: PlantUpdate = {
     plantId: req.body.plantId,
     plantName: req.body.plantName,
     dateAdded: req.body.date,
