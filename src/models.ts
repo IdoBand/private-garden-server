@@ -9,7 +9,7 @@ const PlantSchema = new mongoose.Schema({
     },
   });
 
-export const PlantModel = mongoose.model('PlantModel', PlantSchema, 'plants')
+export const PlantModel = mongoose.model<typeof PlantSchema>('PlantModel', PlantSchema, 'plants')
 
 const PlantUpdateSchema = new mongoose.Schema({
   plantId: String,
@@ -28,4 +28,4 @@ const PlantUpdateSchema = new mongoose.Schema({
   notes: String
 })
 
-export const PlantUpdateModel = mongoose.model('PlantUpdate', PlantUpdateSchema, 'updates')
+export const PlantUpdateModel = mongoose.model<typeof PlantUpdateSchema>('PlantUpdate', PlantUpdateSchema, 'updates')

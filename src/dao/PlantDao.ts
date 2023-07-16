@@ -1,9 +1,8 @@
-import mongoose, { Model } from "mongoose";
 import { PlantModel } from '../models';
 import { AbstractDao } from "./AbstractDao"
 export class PlantDao extends AbstractDao {
 
-    model: any
+    model: typeof PlantModel
     constructor() {
         super()
         this.model = PlantModel

@@ -1,10 +1,8 @@
-import mongoose, { Model, Connection, Collection } from "mongoose";
 import { PlantUpdateModel } from '../models';
-import mongoosePool from '../mongo/mongooseConnection';
 import { AbstractDao } from "./AbstractDao";
 
 export class PlantUpdateDao extends AbstractDao{
-    model: any
+    model: typeof PlantUpdateModel
     constructor() {
         super()
         this.model = PlantUpdateModel
@@ -58,6 +56,7 @@ export class PlantUpdateDao extends AbstractDao{
     async removeUpdates(idsArray: string[]) {
         try {
             const response = await PlantUpdateModel.deleteMany({_id: {$in: idsArray}})
+            return response
         } catch (err) {
             console.log('Failed to remove some or all updates.' + err)
             throw err
@@ -69,6 +68,7 @@ export class PlantUpdateDao extends AbstractDao{
                 updateId,
                 newInfo
             )
+            return response
         } catch (err) {
             console.log('Failed to remove some or all updates.' + err)
             throw err
