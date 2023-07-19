@@ -6,7 +6,7 @@ export class PlanetNetDao extends AbstractDao{
     constructor(){
         super()
         this.basicURL = 'https://my-api.plantnet.org'
-        this.#API_KEY = process.env.PLANET_NET_API_KEY
+        this.#API_KEY = process.env.PLANET_NET_API_KEY || ''
     }
     async fetchIdentifyPlantPost(originalImageNames: string[]) {
         try {

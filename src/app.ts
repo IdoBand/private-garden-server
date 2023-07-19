@@ -7,7 +7,7 @@ import { upload } from './multerStorageConfig';
 import bodyParser from 'body-parser';
 import { PlanetNetDao } from './dao/PlanetNetDao';
 import { PlantUpdate } from './types';
-
+import plantsRoute from './controller/plantsRoute';
 const app = express()
 
 let updateDao: PlantUpdateDao
@@ -22,6 +22,7 @@ export async function initiateApp() {
 
 app.use(cors());
 app.use(bodyParser.json())
+app.use('/plants', plantsRoute)
 /////////////
 app.get('test', (req: Request, res: Response) => {
   res.send('/hi')})
@@ -103,30 +104,8 @@ app.post('/removeUpdates', async (req: Request, res: Response) => {
 }
 })
 ///////////////////       P L A N T    D A O        ///////////////////
-app.post('/addPlant', upload.single('plantImage'), async (req: Request, res: Response) => {
-  let imageOriginalName = '';
-  if (req.file) {
-    imageOriginalName = req.file.originalname
-  }
-  try {
-    const result = await plantDao.addPlant(req.body.plantName, imageOriginalName)
-    const response = {message: 'Plant was saved successfully!',
-                      plantId: result._id}
-    
-    res.status(200).send(JSON.stringify(response))
-  } catch (err){
-    res.status(400).send(JSON.stringify({message: 'Failed to save plant.'}))
-  }
-})
 
-app.get('/getEntireGarden', async (req: Request, res: Response) => {
-  try {
-    const entireGarden = await plantDao.getEntireGarden()
-    res.status(200).json(entireGarden)
-} catch (err) {
-    res.status(400).send(JSON.stringify({message: 'Failed to get entire garden.'}))
-}
-})
+
 app.get('/plant/:id', async (req: Request, res: Response) => {
   try {
     const plant = await plantDao.getPlantById(req.params.id)
@@ -135,35 +114,6 @@ app.get('/plant/:id', async (req: Request, res: Response) => {
     res.status(400).send(JSON.stringify({message: 'Failed to get plant. Url or plant id might be incorrect.'}))
 }
 })
-
-app.post('/removePlants', async (req: Request, res: Response) => {
-  try {
-    await plantDao.removePlants(req.body.IdsToRemove)
-    res.status(200).send(JSON.stringify({message: 'Plants were removed successfully!'}))
-} catch (err) {
-    res.status(400).send(JSON.stringify({message: 'Failed to remove plant.'}))
-}
-})
-
-app.post('/editPlantById', upload.single('plantImage'), async (req: Request, res: Response) => {
-  let imageOriginalName = '';
-  if (req.file) {
-    imageOriginalName = req.file.originalname
-  }
-  try {
-
-    const plantId = req.body.plantId
-    const newInfo = {plantName: req.body.plantName,
-                    img: imageOriginalName}
-  
-    const result = await plantDao.editPlant(plantId, newInfo)
-    res.status(200).send(JSON.stringify({message: 'Plant was updated successfully!', result}))
-  } catch (err) {
-    res.status(400).send(JSON.stringify({message: 'Failed to edit plant.'}))
-}
-})
-
-
 ///////////////////        P l @ n t    N e t        ///////////////////
 
 app.post('/IdentifyPlant', upload.array('plantImages'), async (req: Request, res: Response) => {
@@ -185,4 +135,5 @@ app.post('/IdentifyPlant', upload.array('plantImages'), async (req: Request, res
     }
     
   })
+
 export default app;

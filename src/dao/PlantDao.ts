@@ -1,6 +1,6 @@
 import { PlantModel } from '../models';
 import { AbstractDao } from "./AbstractDao"
-import { PlantEdit } from 'src/types';
+import { Plant, PlantEdit } from '../types'
 export class PlantDao extends AbstractDao {
 
     model: typeof PlantModel
@@ -68,6 +68,46 @@ export class PlantDao extends AbstractDao {
         } catch (err) {
             console.log('Failed to update plant. ' + err)
             throw err
+        }
+    }
+    async add(plant: Plant, imageName: string) {
+        const savePlant = new PlantModel({
+            userId: plant.userId,
+            plantName: plant.plantName,
+            dateAdded: plant.dateAdded,
+            img: this.deicideImage(imageName)})
+        try {
+            const result = await savePlant.save()
+            console.log('Plant was successfully saved!')
+            return result
+        }catch(err) {
+            console.log('could not save image' + err)
+            throw err
+        }
+    }
+    async edit(plant: Plant, imageName: string) {
+        plant.img = this.deicideImage(imageName)
+        try {
+            await PlantModel.findByIdAndUpdate(plant._id, plant)
+        } catch (err) {
+            console.log('Failed to edit plant. ' + err);
+            throw err
+        }
+    }
+    async delete(ids: string[]) {
+        try {
+            await PlantModel.deleteMany({_id: {$in: ids}})
+        } catch (err) {
+            console.log(`Failed to remove plant` + err)
+            throw err
+        }
+    }
+    async getGarden(userId: string ) {
+        try {
+            const garden = await PlantModel.find({ userId: userId })
+            return garden
+        } catch (err) {
+            console.log(`Failed to get garden for ${userId}`);
         }
     }
 }

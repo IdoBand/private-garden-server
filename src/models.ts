@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const PlantSchema = new mongoose.Schema({
     plantName: String,
     dateAdded: String,
+    userId: String,
     img: {
       data: Buffer,
       contentType: String,
