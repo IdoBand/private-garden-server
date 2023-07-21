@@ -17,12 +17,17 @@ export class PlanetNetDao extends AbstractDao{
             formData.append('images', blob)
             this.removeImageFromStorage(originalImageNames[i])
         }
-        const response = await fetch (`${this.basicURL}/v2/identify/all?include-related-images=true&no-reject=false&lang=en&api-key=${this.#API_KEY}`, 
-            {method: 'POST',
-            body: formData})
+        const response = await fetch (
+            `${this.basicURL}/v2/identify/all?include-related-images=true&no-reject=false&lang=en&api-key=${this.#API_KEY}`, 
+            {
+                method: 'POST',
+                body: formData
+            })
         const res = await response.json()
         console.log(res);
-        
+        if (res.message) {
+            throw Error (res.message)
+        }
         return res
         } catch (err) {
             console.log('Something went wrong, ' + err)

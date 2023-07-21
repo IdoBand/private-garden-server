@@ -6,9 +6,8 @@ export interface PlantUpdate {
     _id?: string
     userId?: string
     plantId?: string
-    plantName?: string
     dateAdded?: string
-    img?: string | { data: Buffer | []; contentType: string }
+    images?: string[] | { data: Buffer | []; contentType: string }[]
     irrigation?: Irrigation
     notes?: string
 }

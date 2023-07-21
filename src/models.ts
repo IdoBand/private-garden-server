@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const PlantSchema = new mongoose.Schema({
     plantName: String,
-    dateAdded: String,
+    dateAdded: Date,
     userId: String,
     img: {
       data: Buffer,
@@ -14,19 +14,19 @@ export const PlantModel = mongoose.model<typeof PlantSchema>('PlantModel', Plant
 
 const PlantUpdateSchema = new mongoose.Schema({
   plantId: String,
-  plantName: String,
-  dateAdded: String,
-  img: {
+  userId: String,
+  dateAdded: Date,
+  notes: String,
+  images: [{
     data: Buffer,
     contentType: String,
-  },
+  }],
   irrigation: {
     boolean: Boolean,
     waterQuantity: Number,
     fertilizer: String,
     fertilizerQuantity: Number
   },
-  notes: String
-})
+});
 
 export const PlantUpdateModel = mongoose.model<typeof PlantUpdateSchema>('PlantUpdate', PlantUpdateSchema, 'updates')
