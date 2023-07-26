@@ -2,7 +2,9 @@ import { Router, Request, Response } from 'express';
 import { PlantDao } from '../dao/PlantDao';
 import { upload } from '../multerStorageConfig';
 import { Plant } from '../types';
+import { PlantUpdateDao } from '../dao/PlantUpdateDao';
 const plantDao = new PlantDao
+const plantUpdateDao = new PlantUpdateDao
 const router = Router()
 router.get('/:userId', async (req: Request, res: Response) => {
   try {
@@ -63,14 +65,17 @@ router.get('/:userId/:id', async (req: Request, res: Response) => {
 router.post('/delete', async (req: Request, res: Response) => {
   const ids = req.body.ids
   if (ids && ids.length > 0) {
-    try {
-      await plantDao.delete(ids)
-      res.status(200).send(JSON.stringify({success: true, message: 'Delete query successful'}))
-    } catch (err) {
-      res.status(400).send(JSON.stringify({success: false, message: 'Failed to delete plants.'}))
+    for (const id of ids) {
+      try {
+        await plantUpdateDao.deleteAllByPlantId(id)
+        await plantDao.delete([id])
+      } catch (err) {
+        res.status(400).send(JSON.stringify({success: false, message: 'Bad request. ids could be empty or maybe a mismatch between update and plant ids.'}))
+      }
     }
+    res.status(200).send(JSON.stringify({success: true, message: 'Delete query successful'}))
   } else {
-    res.status(400).send(JSON.stringify({success: false, message: 'Bad request ids could be empty.'}))
+    res.status(400).send(JSON.stringify({success: false, message: 'Failed to delete plants. ids could be empty'}))
   }
 })
   export default router;

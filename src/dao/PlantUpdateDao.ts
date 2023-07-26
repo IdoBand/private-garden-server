@@ -55,7 +55,18 @@ export class PlantUpdateDao extends AbstractDao{
             const response = await PlantUpdateModel.deleteMany({_id: {$in: ids}})
             if (response.deletedCount === 0 || response.acknowledged === false) {
                 throw Error
-            }   
+            }  
+        } catch (err) {
+            console.log(`Failed to remove plant` + err)
+            throw err
+        }
+    }
+    async deleteAllByPlantId(plantId: string) {
+        try {
+            const response = await PlantUpdateModel.deleteMany({plantId: plantId})
+            if (response.acknowledged === false) {
+                throw Error
+            }  
         } catch (err) {
             console.log(`Failed to remove plant` + err)
             throw err
