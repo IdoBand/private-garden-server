@@ -23,3 +23,6 @@ ideas
 /node_modules
 /.pnp
 .pnp.js
+
+private-garden-server-key
+private-garden-server-key.pem
