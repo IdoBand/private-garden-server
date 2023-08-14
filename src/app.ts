@@ -6,6 +6,8 @@ import bodyParser from 'body-parser';
 import { PlanetNetDao } from './dao/PlanetNetDao';
 import plantsRoute from './controller/plantsRoute';
 import plantUpdatesRoute from './controller/plantUpdatesRoute'
+import usersRoute from './controller/userRoute'
+
 const app = express()
 
 let planetNetDao: PlanetNetDao
@@ -18,6 +20,7 @@ app.use(cors());
 app.use(bodyParser.json())
 app.use('/plants', plantsRoute)
 app.use('/plantUpdates', plantUpdatesRoute)
+app.use('/users', usersRoute)
 
 app.get('/test', (req: Request, res: Response) => {
   res.send('Server is up and running!')})

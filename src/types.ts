@@ -18,7 +18,6 @@ export interface Irrigation {
     fertilizerQuantity?: number
 }
 
-///////////////////////////
 export interface Plant {
     _id?: string
     userId: string
@@ -27,12 +26,16 @@ export interface Plant {
     img?: { data: Buffer | []; contentType: string }
 }
 export interface User {
-    id: string // email
-    firsName: string
+    id: string
+    firstName: string
     lastName: string
-    dateAdded: Date
-    lastLogin: Date
+    dateAdded?: Date
+    lastActive?: Date
+    profileImg?: string | { data: Buffer | []; contentType: string }
+    followers?: string[],
+    following?: string[]
 }
+
 export interface responseObject {
     success: boolean
     message: string

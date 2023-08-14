@@ -30,3 +30,19 @@ const PlantUpdateSchema = new mongoose.Schema({
 });
 
 export const PlantUpdateModel = mongoose.model<typeof PlantUpdateSchema>('PlantUpdate', PlantUpdateSchema, 'updates')
+
+const UserSchema = new mongoose.Schema({
+  id: {type: String , unique: true},
+  firstName: String,
+  LastName: String,
+  dateAdded: Date,
+  lastActive: Date,
+  // profileImg: {
+  //   data: Buffer,
+  //   contentType: String,
+  // },
+  followers: [String],
+  following: [String],
+});
+
+export const UserModel = mongoose.model<typeof UserSchema>('UserModel', UserSchema, 'users')
