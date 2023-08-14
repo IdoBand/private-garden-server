@@ -7,6 +7,7 @@ import { PlanetNetDao } from './dao/PlanetNetDao';
 import plantsRoute from './controller/plantsRoute';
 import plantUpdatesRoute from './controller/plantUpdatesRoute'
 import usersRoute from './controller/userRoute'
+
 const app = express()
 
 let planetNetDao: PlanetNetDao
