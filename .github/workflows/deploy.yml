@@ -32,7 +32,7 @@ jobs:
           git stash
           git pull origin main
           npm install
-          pm2 restart private-garden-server
+          sudo pm2 restart private-garden-server
               
     - name: Remove Github Actions IP from security group
       run: |
