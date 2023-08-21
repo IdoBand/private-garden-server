@@ -3,7 +3,6 @@ import { AbstractDao } from "./AbstractDao";
 import { User } from "../types";
 export class UserDao extends AbstractDao {
     readonly model: typeof UserModel
-
     constructor() {
         super()
         this.model = UserModel
@@ -73,6 +72,42 @@ export class UserDao extends AbstractDao {
                 }
                 response = await this.add(newUser)
             }
+            return response
+        } catch (err) {
+            console.log(`Failed to upsert user ---> ${user.id}` , err)
+            throw err
+        }
+    }
+    async getUserDataForPost(userId: string) {
+        try {            
+            const response = await this.model
+                .findOne({ id: userId })
+                .select({ firstName: 1, lastName: 1, profileImg: 1 });
+            return {
+                userName: response.firstName + ' ' + response.lastName,
+                profileImg: response.profileImg,
+            }
+        } catch (err) {
+            console.log('Failed to get user data for post')
+            throw err
+        }
+    }
+    async addDummyUser(user: User, imageFileName: string) {
+        let response
+
+        try {
+            const now = new Date()
+            const newUser = new UserModel ({
+                ...user,
+                profileImg: this.deicideImage(imageFileName),
+                dateAdded: now,
+                lastActive: now,
+                followers: ['jonathan.walters@dummy.com', 'rose.white@dummy.com', 'lilly.harmon@dummy.com'],
+                following: ['lilly.harmon@dummy.com', 'jonathan.walters@dummy.com', 'daniel.clifford@dummy.com']
+            })
+            response = await newUser.save()
+            console.log(response);
+                
             return response
         } catch (err) {
             console.log(`Failed to upsert user ---> ${user.id}` , err)

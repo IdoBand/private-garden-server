@@ -32,15 +32,15 @@ const PlantUpdateSchema = new mongoose.Schema({
 export const PlantUpdateModel = mongoose.model<typeof PlantUpdateSchema>('PlantUpdate', PlantUpdateSchema, 'updates')
 
 const UserSchema = new mongoose.Schema({
-  id: {type: String , unique: true},
+  id: String,
   firstName: String,
-  LastName: String,
+  lastName: String,
   dateAdded: Date,
   lastActive: Date,
-  // profileImg: {
-  //   data: Buffer,
-  //   contentType: String,
-  // },
+  profileImg: {
+    data: Buffer,
+    contentType: String,
+  },
   followers: [String],
   following: [String],
 });

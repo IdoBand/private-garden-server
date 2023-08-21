@@ -1,18 +1,35 @@
 import { Router, Request, Response } from 'express';
 import { upload } from '../multerStorageConfig';
 import { PostDao } from '../dao/PostDao';
+import { UserDao } from '../dao/UserDao';
+import { Post } from 'src/types';
 
 const postDao = new PostDao()
+const userDao = new UserDao()
 const router = Router()
 
 
 router.get('/',  async (req: Request, res: Response) => {
   try {
-    const result = await postDao.getAllPosts()
+    const rawPosts = await postDao.getAllPosts()
+    const posts = await Promise.all(
+      rawPosts.map(async (post) => {
+        const { userName, profileImg } = await userDao.getUserDataForPost(post.userId)
+        console.log(userName);
+        
+        return {
+          // @ts-ignore
+          ...post._doc,
+          userName,
+          profileImg
+        }
+      })
+    )
+
     const response = {
       success: true,
       message: '',
-      data: result
+      data: posts
     }
     res.status(200).send(JSON.stringify(response))
   } catch (err) {
