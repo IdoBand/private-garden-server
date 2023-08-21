@@ -7,6 +7,7 @@ import { PlanetNetDao } from './dao/PlanetNetDao';
 import plantsRoute from './controller/plantsRoute';
 import plantUpdatesRoute from './controller/plantUpdatesRoute'
 import usersRoute from './controller/userRoute'
+import postsRoute from './controller/postsRoute'
 
 const app = express()
 
@@ -21,6 +22,7 @@ app.use(bodyParser.json())
 app.use('/plants', plantsRoute)
 app.use('/plantUpdates', plantUpdatesRoute)
 app.use('/users', usersRoute)
+app.use('/posts', postsRoute)
 
 app.get('/test', (req: Request, res: Response) => {
   res.send('Server is up and running!')})

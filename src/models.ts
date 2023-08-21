@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import { Comment } from "./types";
 const PlantSchema = new mongoose.Schema({
     plantName: String,
     dateAdded: Date,
@@ -46,3 +46,21 @@ const UserSchema = new mongoose.Schema({
 });
 
 export const UserModel = mongoose.model<typeof UserSchema>('UserModel', UserSchema, 'users')
+
+const PostSchema = new mongoose.Schema({
+  userId: String,
+  images: [{
+    data: Buffer,
+    contentType: String,
+  }],
+  dateAdded: Date,
+  text: String,
+  likes: [String],
+  comments: [{
+    userId: String,
+    text: String,
+    dateAdded: Date
+  }],
+});
+
+export const PostModel = mongoose.model<typeof PostSchema>('PostModel', PostSchema, 'posts')
