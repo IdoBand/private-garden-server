@@ -106,8 +106,6 @@ export class UserDao extends AbstractDao {
                 following: ['lilly.harmon@dummy.com', 'jonathan.walters@dummy.com', 'daniel.clifford@dummy.com']
             })
             response = await newUser.save()
-            console.log(response);
-                
             return response
         } catch (err) {
             console.log(`Failed to upsert user ---> ${user.id}` , err)

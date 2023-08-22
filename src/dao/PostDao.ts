@@ -11,7 +11,7 @@ export class PostDao extends AbstractDao {
     async add(newPost: Partial<Post>, imageNamesArray: string[]) {
         try {
             const images = this.deicideMultipleImages(imageNamesArray)
-            // userId, text, dateAdded are coming from frontend
+            // properties userId, text, dateAdded are coming from frontend
             const savePost = new PostModel({
                 ...newPost,
                 images,
@@ -20,7 +20,6 @@ export class PostDao extends AbstractDao {
             })
             const response = await savePost.save()
             return response._id
-            
         } catch (err) {
             console.log('Failed to add post.' + err)
             throw err
@@ -32,6 +31,39 @@ export class PostDao extends AbstractDao {
             return result
         } catch (err) {
             console.log('Failed to get all posts.' + err)
+            throw err
+        }
+    }
+    async delete(postId: string) {
+        try {
+            const result = this.model.findOneAndDelete({_id: postId})
+            return result
+        } catch (err) {
+            console.log('Failed to get all posts.' + err)
+            throw err
+        }
+    }
+    async dislikePost(postId: string, userId: string) {
+        try {
+            const result = this.model.updateOne(
+                { _id: postId },
+                {$pull: { likes: userId }}
+            )
+            return result
+        } catch (err) {
+            console.log('Failed to dislike post.' + err)
+            throw err
+        }
+    }
+    async likePost(postId: string, userId: string) {
+        try {
+            const result = this.model.updateOne(
+                { _id: postId },
+                { $push: { likes: userId }},
+            )
+            return result
+        } catch (err) {
+            console.log('Failed to like post.' + err)
             throw err
         }
     }
