@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import { upload } from '../multerStorageConfig';
 import { PostDao } from '../dao/PostDao';
 import { UserDao } from '../dao/UserDao';
-import { Post } from '../types';
 
 const postDao = new PostDao()
 const userDao = new UserDao()
@@ -56,7 +55,7 @@ router.post('/', upload.array('postImages'), async (req: Request, res: Response)
 })
 router.post('/like', async (req: Request, res: Response) => {
   try {
-    let response = {
+    const response = {
       success: true,
       message: '',
       data: null
@@ -101,7 +100,7 @@ router.get('/delete/:id', async (req: Request, res: Response) => {
     const response = {
       success: true,
       message: '',
-      data: postId
+      data: result
     }
     res.status(200).send(JSON.stringify(response))
   } catch (err) {

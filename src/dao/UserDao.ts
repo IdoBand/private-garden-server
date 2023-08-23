@@ -23,13 +23,7 @@ export class UserDao extends AbstractDao {
     }
     async add(user: User) {
         const saveUser = new UserModel({
-            id: user.id,
-            firstName: user.firstName,
-            LastName: user.lastName,
-            dateAdded: user.dateAdded,
-            lastActive: user.lastActive,
-            followers: user.followers,
-            following: user.following
+            ...user
         })
         try {
             const response = await saveUser.save()
@@ -48,28 +42,29 @@ export class UserDao extends AbstractDao {
             throw err
         }
     }
-    async handleSignIn(user: User) {
+    async handleSignIn(user: User, imageFileName: string) {
         let response
-        console.log(user);
-        
+
         try {
-            const doesUserExists = await this.model.findOne({id: user.id}).exec()
+            const doesUserExists = await this.model.findOne({id: user.id})
             const now = new Date()
-            console.log('does user exists:' ,doesUserExists);
+            // console.log('does user exists:' ,doesUserExists);
             if (doesUserExists) {
+                console.log('suppose to update', user);
                 user = {...user, lastActive: now}
                 response = await this.update(user)
-                console.log('suppose to update');
             } else {
-                console.log('suppose to add');
+                console.log('suppose to add:', user);
                 
                 const newUser = {
                     ...user,
+                    profileImg: this.deicideImage(imageFileName),
                     dateAdded: now,
                     lastActive: now,
                     followers: [],
                     following: []
                 }
+
                 response = await this.add(newUser)
             }
             return response
@@ -102,8 +97,8 @@ export class UserDao extends AbstractDao {
                 profileImg: this.deicideImage(imageFileName),
                 dateAdded: now,
                 lastActive: now,
-                followers: ['jonathan.walters@dummy.com', 'rose.white@dummy.com', 'lilly.harmon@dummy.com'],
-                following: ['lilly.harmon@dummy.com', 'jonathan.walters@dummy.com', 'daniel.clifford@dummy.com']
+                followers: [],
+                following: []
             })
             response = await newUser.save()
             return response
