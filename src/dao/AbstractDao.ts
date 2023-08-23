@@ -30,6 +30,11 @@ export abstract class AbstractDao {
             console.log('Image file was deleted successfully');
         })
     }
+    deicideMultipleImages(imageNamesArray: string []) {
+        return imageNamesArray.map(imageName => {
+            return this.deicideImage(imageName)
+        })
+    }
 }
 
 

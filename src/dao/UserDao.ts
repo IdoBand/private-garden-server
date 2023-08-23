@@ -3,7 +3,6 @@ import { AbstractDao } from "./AbstractDao";
 import { User } from "../types";
 export class UserDao extends AbstractDao {
     readonly model: typeof UserModel
-
     constructor() {
         super()
         this.model = UserModel
@@ -24,13 +23,7 @@ export class UserDao extends AbstractDao {
     }
     async add(user: User) {
         const saveUser = new UserModel({
-            id: user.id,
-            firstName: user.firstName,
-            LastName: user.lastName,
-            dateAdded: user.dateAdded,
-            lastActive: user.lastActive,
-            followers: user.followers,
-            following: user.following
+            ...user
         })
         try {
             const response = await saveUser.save()
@@ -49,30 +42,65 @@ export class UserDao extends AbstractDao {
             throw err
         }
     }
-    async handleSignIn(user: User) {
+    async handleSignIn(user: User, imageFileName: string) {
         let response
-        console.log(user);
-        
+
         try {
-            const doesUserExists = await this.model.findOne({id: user.id}).exec()
+            const doesUserExists = await this.model.findOne({id: user.id})
             const now = new Date()
-            console.log('does user exists:' ,doesUserExists);
+            // console.log('does user exists:' ,doesUserExists);
             if (doesUserExists) {
+                console.log('suppose to update', user);
                 user = {...user, lastActive: now}
                 response = await this.update(user)
-                console.log('suppose to update');
             } else {
-                console.log('suppose to add');
+                console.log('suppose to add:', user);
                 
                 const newUser = {
                     ...user,
+                    profileImg: this.deicideImage(imageFileName),
                     dateAdded: now,
                     lastActive: now,
                     followers: [],
                     following: []
                 }
+
                 response = await this.add(newUser)
             }
+            return response
+        } catch (err) {
+            console.log(`Failed to upsert user ---> ${user.id}` , err)
+            throw err
+        }
+    }
+    async getUserDataForPost(userId: string) {
+        try {            
+            const response = await this.model
+                .findOne({ id: userId })
+                .select({ firstName: 1, lastName: 1, profileImg: 1 });
+            return {
+                userName: response.firstName + ' ' + response.lastName,
+                profileImg: response.profileImg,
+            }
+        } catch (err) {
+            console.log('Failed to get user data for post')
+            throw err
+        }
+    }
+    async addDummyUser(user: User, imageFileName: string) {
+        let response
+
+        try {
+            const now = new Date()
+            const newUser = new UserModel ({
+                ...user,
+                profileImg: this.deicideImage(imageFileName),
+                dateAdded: now,
+                lastActive: now,
+                followers: [],
+                following: []
+            })
+            response = await newUser.save()
             return response
         } catch (err) {
             console.log(`Failed to upsert user ---> ${user.id}` , err)

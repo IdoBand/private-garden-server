@@ -41,3 +41,20 @@ export interface responseObject {
     message: string
     data?: any
 }
+export type Post = {
+    _id?: string,
+    userId: string,
+    images: string[] | { data: Buffer | []; contentType: string }[]
+    dateAdded: Date
+    text: string
+    likes: string[]
+    comments: Comment[]
+    userName?: string
+    profileImg?: { data: Buffer | []; contentType: string }
+    
+}
+export type Comment = {
+    userId: string
+    text: string
+    dateAdded: Date
+}
