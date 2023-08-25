@@ -1,11 +1,13 @@
 import { AbstractDao } from "./AbstractDao";
-import { PostModel } from "../models";
-import { Post } from '../types'
+import { PostModel, LikeModel } from "../models";
+import { Like, Post } from '../types'
 export class PostDao extends AbstractDao {
     model: typeof PostModel
+    likesModel: typeof LikeModel
     constructor() {
         super()
         this.model = PostModel
+        this.likesModel = LikeModel
     }
 
     async add(newPost: Partial<Post>, imageNamesArray: string[]) {
@@ -15,7 +17,6 @@ export class PostDao extends AbstractDao {
             const savePost = new PostModel({
                 ...newPost,
                 images,
-                likes: [],
                 comments: [],
             })
             const response = await savePost.save()
@@ -43,27 +44,48 @@ export class PostDao extends AbstractDao {
             throw err
         }
     }
-    async dislikePost(postId: string, userId: string) {
+    async dislikePost(userId: string, postId: string) {
         try {
-            const result = this.model.updateOne(
-                { _id: postId },
-                {$pull: { likes: userId }}
-            )
+            const result = await this.likesModel.findOneAndDelete({userId: userId, postId: postId})
             return result
+            
         } catch (err) {
             console.log('Failed to dislike post.' + err)
             throw err
         }
     }
-    async likePost(postId: string, userId: string) {
+    async likePost(likeData: Like) {
         try {
-            const result = this.model.updateOne(
-                { _id: postId },
-                { $push: { likes: userId }},
-            )
+            const saveLike = new LikeModel({
+                userId: likeData.userId,
+                postId: likeData.postId,
+                dateAdded: new Date()
+            })
+            const result = await saveLike.save()
             return result
         } catch (err) {
             console.log('Failed to like post.' + err)
+            throw err
+        }
+    }
+    async countLikes(postId: string) {
+        try {
+            const result = await this.likesModel.countDocuments({ postId })
+            return result
+        } catch (err) {
+            console.log(`Failed to count how many likes for ${postId}.` + err)
+            throw err
+        }
+    }
+    async didUserLike(userId: string, postId: string): Promise<boolean> {
+        try {
+            const result = await this.likesModel.countDocuments({ postId, userId })
+            if (result) {
+                return true
+            }
+            return false
+        } catch (err) {
+            console.log(`Failed to query did user like for ${postId}.` + err)
             throw err
         }
     }

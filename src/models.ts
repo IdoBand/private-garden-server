@@ -55,7 +55,6 @@ const PostSchema = new mongoose.Schema({
   }],
   dateAdded: Date,
   text: String,
-  likes: [String],
   comments: [{
     userId: String,
     text: String,
@@ -64,3 +63,12 @@ const PostSchema = new mongoose.Schema({
 });
 
 export const PostModel = mongoose.model<typeof PostSchema>('PostModel', PostSchema, 'posts')
+
+
+const LikeSchema = new mongoose.Schema({
+  userId: String,
+  postId: String,
+  dateAdded: Date,
+});
+
+export const LikeModel = mongoose.model<typeof LikeSchema>('LikeModel', LikeSchema, 'likes')
