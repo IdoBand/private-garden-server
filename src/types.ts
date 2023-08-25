@@ -47,11 +47,16 @@ export type Post = {
     images: string[] | { data: Buffer | []; contentType: string }[]
     dateAdded: Date
     text: string
-    likes: string[]
+    likes: number
     comments: Comment[]
     userName?: string
     profileImg?: { data: Buffer | []; contentType: string }
-    
+    didUserLike?: boolean
+}
+export type Like = {
+    userId: string
+    postId: string
+    dateAdded: Date
 }
 export type Comment = {
     userId: string
