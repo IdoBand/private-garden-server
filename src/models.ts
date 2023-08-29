@@ -64,7 +64,6 @@ const PostSchema = new mongoose.Schema({
 
 export const PostModel = mongoose.model<typeof PostSchema>('PostModel', PostSchema, 'posts')
 
-
 const LikeSchema = new mongoose.Schema({
   userId: String,
   postId: String,

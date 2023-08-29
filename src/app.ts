@@ -7,8 +7,9 @@ import bodyParser from 'body-parser';
 import { PlanetNetDao } from './dao/PlanetNetDao';
 import { UserController } from './controller/UserController';
 import { PostController } from './controller/PostController';
-import { PlantUpdateController } from './controller/plantUpdateController';
+import { PlantUpdateController } from './controller/PlantUpdateController';
 import { PlantController } from './controller/PlantController';
+
 const app = express()
 
 let planetNetDao: PlanetNetDao
@@ -31,7 +32,6 @@ export async function initiateApp() {
   app.use('/users', userController.getRouter())
   app.use('/posts', postController.getRouter())
 }
-
 
 app.get('/test', (req: Request, res: Response) => {
   res.send('Server is up and running!')})

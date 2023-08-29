@@ -1,6 +1,7 @@
 import { AbstractDao } from "./AbstractDao";
 import { PostModel, LikeModel } from "../models";
 import { Like, Post } from '../types'
+
 export class PostDao extends AbstractDao {
     model: typeof PostModel
     likesModel: typeof LikeModel
@@ -48,7 +49,6 @@ export class PostDao extends AbstractDao {
         try {
             const result = await this.likesModel.findOneAndDelete({userId: userId, postId: postId})
             return result
-            
         } catch (err) {
             console.log('Failed to dislike post.' + err)
             throw err
