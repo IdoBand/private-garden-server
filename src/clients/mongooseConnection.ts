@@ -10,10 +10,11 @@ let connection: typeof mongoose | undefined
 export async function connectToMongo() {
     try {
         const defaultConnection = await mongoose.connect(URI)
-        console.log("Mongoose has successfully connected to Mongo!")
+        console.log("Mongoose connection - ", true)
         connection = defaultConnection;
     } catch (err) {
-        console.log('Mongoose could not connected to Mongo...' + err)
+        console.log("Mongoose connection - ", false)
+        console.log(err);
         process.exit(1);
     }
 }
