@@ -71,4 +71,3 @@ const LikeSchema = new mongoose.Schema({
 });
 
 export const LikeModel = mongoose.model<typeof LikeSchema>('LikeModel', LikeSchema, 'likes')
-

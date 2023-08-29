@@ -1,5 +1,10 @@
 import  fs  from "fs";
+import { S3BucketManager } from "./S3Bucket";
 export abstract class AbstractDao {
+    s3: S3BucketManager
+    constructor() {
+        this.s3 = new S3BucketManager()
+    }
     deicideImage(imageName: string): {data: Buffer | [] , contentType: string} {
         if (imageName) {
             try {
