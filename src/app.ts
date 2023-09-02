@@ -29,8 +29,8 @@ export async function initiateApp() {
   app.use(bodyParser.json())
   app.use('/plants', plantController.getRouter())
   app.use('/plantUpdates', plantUpdateController.getRouter())
-  app.use('/users', userController.getRouter())
   app.use('/posts', postController.getRouter())
+  app.use('/users', userController.getRouter())
 }
 
 app.get('/test', (req: Request, res: Response) => {
