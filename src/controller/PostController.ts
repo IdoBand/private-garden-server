@@ -2,12 +2,14 @@ import { Router, Request, Response } from 'express';
 import { upload } from '../multerStorageConfig';
 import { PostDao } from '../dao/PostDao';
 import { UserDao } from '../dao/UserDao';
+import { AbstractController } from './AbstractController';
 
-export class PostController {
+export class PostController extends AbstractController{
   postDao: PostDao
   userDao: UserDao
   router: Router
   constructor() {
+    super()
     this.router = Router()
     this.postDao = new PostDao()
     this.userDao = new UserDao()
@@ -17,7 +19,6 @@ export class PostController {
     this.router.get('/:userId', this.getAllPosts)
     this.router.post('/', upload.array('postImages'), this.addPost)
     this.router.post('/like', this.like)
-    this.router.post('/addDummy', upload.array('postImages'), this.addDummy)
     this.router.get('/delete/:id', this.deletePost)
   }
   getRouter() {
@@ -59,14 +60,11 @@ export class PostController {
     }
   }
   addPost = async (req: Request, res: Response) => {
-    const originalImageNames: string[] = []
     const files = req.files as Express.Multer.File[];
-    for (let i = 0; i < files.length; i++) {
-      originalImageNames.push(files[i].originalname)
-    }
+    const filesData = this.decideMultipleFilesData(files)
 
     try {
-      const postId = await this.postDao.add(JSON.parse(req.body.post), originalImageNames)
+      const postId = await this.postDao.add(JSON.parse(req.body.post), filesData)
       const response = {
         success: true,
         message: '',
@@ -96,25 +94,7 @@ export class PostController {
       res.status(500).send(JSON.stringify({message: 'Failed to complete like / dislike action.'}))
     }
   }
-  addDummy =  async (req: Request, res: Response) => {
-    const originalImageNames: string[] = []
-    const files = req.files as Express.Multer.File[];
-    for (let i = 0; i < files.length; i++) {
-      originalImageNames.push(files[i].originalname)
-    }
 
-    try {
-      const postId = await this.postDao.add(JSON.parse(req.body.post), originalImageNames)
-      const response = {
-        success: true,
-        message: '',
-        data: postId
-      }
-      res.status(200).send(JSON.stringify(response))
-    } catch (err) {
-      res.status(500).send(JSON.stringify({message: 'Failed to add post.'}))
-    }
-  }
   deletePost = async (req: Request, res: Response) => {
   const postId = req.params.id
     try {

@@ -1,13 +1,14 @@
-import { Irrigation, PlantUpdate } from 'src/types';
+import { FileData, Irrigation, PlantUpdate } from '../types';
 import { PlantUpdateModel } from '../models';
 import { AbstractDao } from "./AbstractDao";
-import { Error } from 'mongoose';
 
 export class PlantUpdateDao extends AbstractDao{
-    model: typeof PlantUpdateModel
+    #model: typeof PlantUpdateModel
+    #s3FolderName: string
     constructor() {
         super()
-        this.model = PlantUpdateModel
+        this.#model = PlantUpdateModel
+        this.#s3FolderName = 'plantUpdateImage'
     }
     deicideIrrigation(irrigation: string, waterQuantity: number, fertilizer: string, fertilizerQuantity: number): Irrigation {
         // since the request is 'content-type: form-data'
@@ -19,26 +20,11 @@ export class PlantUpdateDao extends AbstractDao{
                 waterQuantity: waterQuantity,
                 fertilizer: fertilizer,
                 fertilizerQuantity: fertilizerQuantity
-            }
-    
-    }
-    async editUpdateById(updateId: string, newInfo: PlantUpdate) {
-        try {
-            const response = await PlantUpdateModel.findByIdAndUpdate(
-                updateId,
-                newInfo
-            )
-            return response
-        } catch (err) {
-            console.log('Failed to remove some or all updates.' + err)
-            throw err
         }
     }
-    async add(plantUpdate: PlantUpdate, imageNamesArray: string[]) {
+    async add(plantUpdate: PlantUpdate, filesData: FileData[]) {
         try {
-            const images = imageNamesArray.map(image => {
-                return this.deicideImage(image)
-            })
+            const images = await this.decideMultipleImageFiles(filesData, this.#s3FolderName)
             const savePlantUpdate = new PlantUpdateModel({
                 ...plantUpdate,
                 images: images
@@ -50,40 +36,96 @@ export class PlantUpdateDao extends AbstractDao{
             throw err
         }
     }
-    async delete(ids: string[]) {
+    async delete(id: string) {
+        /**
+         * Unlike 'delete' and 'deleteMany' methods that deletes updates by updates ids,
+         * this method deletes all updates that belong to a unique plant.
+         * 1. get update
+         * 2. check if update has images
+         * 3. images ? delete them : continue
+         * 4.         images deletion ? 
+         *      successful   :   not successful
+         * 5.  delete update        throw error
+         */
         try {
-            const response = await PlantUpdateModel.deleteMany({_id: {$in: ids}})
-            if (response.deletedCount === 0 || response.acknowledged === false) {
-                throw Error
-            }  
+            const plantUpdate = await this.#model.findById(id)
+            if (plantUpdate.images.length > 0) {
+                const deleteFromS3Bucket = await this.s3.deleteMultiple(plantUpdate.images, this.#s3FolderName)
+            }
+            const response = await this.#model.findByIdAndDelete(id)
+            return response
         } catch (err) {
-            console.log(`Failed to remove plant` + err)
+            console.log(`Failed to remove update:`, id)
+            console.log(err)
             throw err
         }
     }
-    async deleteAllByPlantId(plantId: string) {
+    async deleteMany(ids: string[]) {
         try {
-            const response = await PlantUpdateModel.deleteMany({plantId: plantId})
-            if (response.acknowledged === false) {
-                throw Error
-            }  
+            const response = await Promise.all(ids.map(async (id) => {
+                const deletion = await this.delete(id)
+                return deletion
+            }))
+            return response
         } catch (err) {
-            console.log(`Failed to remove plant` + err)
+            console.log('Error occurred while deleting many plant updates');
+            console.log(err);
+        }
+    }
+    async deleteAllByPlantId(plantIds: string[]) {
+        /**
+         * Unlike 'delete' and 'deleteMany' methods that deletes updates by updates ids,
+         * this method deletes all updates that belong to a unique plant.
+         * 1. get all updates by plant id.
+         * 2. iterate over the updates.
+         * 3. for each update iterate over images array to delete all images from s3 bucket.
+         * 4. delete update.
+         * 5. repeat for next plant.
+         */
+        let currentPlantId =''
+        try {
+            const response = await Promise.all(plantIds.map( async (plantId) => {
+                currentPlantId = plantId
+                const updates = await this.#model.find({ plantId })
+                const updatesDeletion = await Promise.all(updates.map( async (update) => {
+                    if (update.images.length > 0) {
+                        const deleteFromS3Bucket = await this.s3.deleteMultiple(update.images, this.#s3FolderName)
+                    }
+                    const response = await this.#model.findByIdAndDelete(update._id)
+                    return response
+                }))
+                return updatesDeletion 
+            }))
+            return response
+        } catch (err) {
+            console.log(`Failed to remove plant updates in the process of deleting an entire plant`)
+            console.log(`plant id:`, currentPlantId)
+            console.log(err);
             throw err
         }
     }
     async getPlantUpdates(plantId: string) {
         try {
-            const plantUpdate = await PlantUpdateModel.find({ plantId: plantId })
-            return plantUpdate
+            const plantUpdates = await PlantUpdateModel.find({ plantId: plantId })
+            const plantUpdatesWithImages = await Promise.all(plantUpdates.map( async (update) => {
+                const updateImages = await this.s3.readMultiple(update.images, this.#s3FolderName)
+                update.images = updateImages
+                return update
+            }))
+            return plantUpdatesWithImages
         } catch (err) {
-            console.log(`Failed to get garden for ${plantId}`);
+            console.log(`Failed to get updates for ${plantId}`);
             throw err
         }
     }
-    async edit(plantUpdate: PlantUpdate, imageNamesArray: string[]) {
+    async edit(plantUpdate: PlantUpdate, filesData: FileData[]) {
         try {
-            plantUpdate.images = imageNamesArray.map(image => {return this.deicideImage(image)})
+            const exitingUpdate = await this.#model.findById(plantUpdate._id)
+            if (exitingUpdate.images.length > 0) {
+                const deleteFromS3Bucket = await this.s3.deleteMultiple(exitingUpdate.images, this.#s3FolderName)
+            }
+            const imageNames = await this.s3.putMultiple(filesData, this.#s3FolderName)
+            plantUpdate.images = imageNames
             const response = await PlantUpdateModel.findByIdAndUpdate(plantUpdate._id, plantUpdate)
             return response
         } catch (err) {
