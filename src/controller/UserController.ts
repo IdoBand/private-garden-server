@@ -22,7 +22,6 @@ export class UserController extends AbstractController {
   }
   getTest = async (req: Request, res: Response) => {
     const fileData = this.decideFileData(req.file)
-
     try {
       const result = await this.userDao.test(fileData)
       const response = {
@@ -49,5 +48,4 @@ export class UserController extends AbstractController {
       res.status(500).send(JSON.stringify({message: 'Failed to upsert user.'}))
     }
   }
-
 }
