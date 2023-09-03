@@ -41,6 +41,7 @@ export class PlantController extends AbstractController {
     }
   }
   addPlant = async (req: Request, res: Response) => {
+
     const fileData = this.decideFileData(req.file)
     const newPlant: Plant = JSON.parse(req.body.plant)
     try {
