@@ -4,10 +4,7 @@ const PlantSchema = new mongoose.Schema({
     plantName: String,
     dateAdded: Date,
     userId: String,
-    img: {
-      data: Buffer,
-      contentType: String,
-    },
+    img: String,
   });
 
 export const PlantModel = mongoose.model<typeof PlantSchema>('PlantModel', PlantSchema, 'plants')
@@ -17,10 +14,7 @@ const PlantUpdateSchema = new mongoose.Schema({
   userId: String,
   dateAdded: Date,
   notes: String,
-  images: [{
-    data: Buffer,
-    contentType: String,
-  }],
+  images: [String],
   irrigation: {
     boolean: Boolean,
     waterQuantity: Number,
@@ -37,10 +31,7 @@ const UserSchema = new mongoose.Schema({
   lastName: String,
   dateAdded: Date,
   lastActive: Date,
-  profileImg: {
-    data: Buffer,
-    contentType: String,
-  },
+  profileImg: String,
   followers: [String],
   following: [String],
 });
@@ -49,21 +40,13 @@ export const UserModel = mongoose.model<typeof UserSchema>('UserModel', UserSche
 
 const PostSchema = new mongoose.Schema({
   userId: String,
-  images: [{
-    data: Buffer,
-    contentType: String,
-  }],
+  images: [String],
   dateAdded: Date,
   text: String,
-  comments: [{
-    userId: String,
-    text: String,
-    dateAdded: Date
-  }],
+  comments: [String],
 });
 
 export const PostModel = mongoose.model<typeof PostSchema>('PostModel', PostSchema, 'posts')
-
 
 const LikeSchema = new mongoose.Schema({
   userId: String,

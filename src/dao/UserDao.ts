@@ -1,27 +1,16 @@
 import { UserModel } from "../models";
 import { AbstractDao } from "./AbstractDao";
-import { User } from "../types";
+import { FileData, User } from "../types";
 export class UserDao extends AbstractDao {
-    readonly model: typeof UserModel
+    #model: typeof UserModel
+    #s3FolderName: string
     constructor() {
         super()
-        this.model = UserModel
+        this.#model = UserModel
+        this.#s3FolderName = 'userProfileImg'
     }
 
-    async upsert(user: User) {
-        try {
-            const filter = { id: user.id }
-            const options = { upsert: true, new: true }
-            const response = await this.model.findOneAndUpdate(filter, {...user}, options)
-            console.log('upsert response', response);
-            
-            return response
-        } catch (err) {
-            console.log(`Failed to upsert user ---> ${user.id}` , err)
-            throw err
-        }
-    }
-    async add(user: User) {
+    private async add(user: User) {
         const saveUser = new UserModel({
             ...user
         })
@@ -33,32 +22,39 @@ export class UserDao extends AbstractDao {
             throw err
         }
     }
-    async update(user: User) {
+    private async update(user: User) {
         try {
-            const response = await this.model.findOneAndUpdate({ id: user.id }, user)
+            const response = await this.#model.findOneAndUpdate({ id: user.id }, user)
             return response
         } catch (err) {
             console.log(`Failed to save update ---> ${user.id}` + err)
             throw err
         }
     }
-    async handleSignIn(user: User, imageFileName: string) {
+    async handleSignIn(user: User, fileData: FileData) {
         let response
 
         try {
-            const doesUserExists = await this.model.findOne({id: user.id})
+            const doesUserExists = await this.#model.findOne({id: user.id})
             const now = new Date()
-            // console.log('does user exists:' ,doesUserExists);
+
             if (doesUserExists) {
                 console.log('suppose to update', user);
                 user = {...user, lastActive: now}
                 response = await this.update(user)
+                if (response.profileImg) {
+                    const url = await this.generateAwsImageUrl(response.profileImg as string)
+                    response.profileImg = url
+                }
+
             } else {
                 console.log('suppose to add:', user);
+
+                const decideProfileImg = await this.decideImageFile(fileData ,this.#s3FolderName)
                 
                 const newUser = {
                     ...user,
-                    profileImg: this.deicideImage(imageFileName),
+                    profileImg: decideProfileImg,
                     dateAdded: now,
                     lastActive: now,
                     followers: [],
@@ -75,36 +71,33 @@ export class UserDao extends AbstractDao {
     }
     async getUserDataForPost(userId: string) {
         try {            
-            const response = await this.model
+            const user = await this.#model
                 .findOne({ id: userId })
                 .select({ firstName: 1, lastName: 1, profileImg: 1 });
+            const profileImg = await this.generateAwsImageUrl(user.profileImg)
             return {
-                userName: response.firstName + ' ' + response.lastName,
-                profileImg: response.profileImg,
+                userName: user.firstName + ' ' + user.lastName,
+                profileImg: profileImg,
             }
         } catch (err) {
             console.log('Failed to get user data for post')
             throw err
         }
     }
-    async addDummyUser(user: User, imageFileName: string) {
-        let response
-
+    async generateAwsImageUrl (imageS3Name: string) {
+        const url = await this.s3.read(`${this.#s3FolderName}/${imageS3Name}`)
+        return url
+    }
+    async s3Migrate() {
         try {
-            const now = new Date()
-            const newUser = new UserModel ({
-                ...user,
-                profileImg: this.deicideImage(imageFileName),
-                dateAdded: now,
-                lastActive: now,
-                followers: [],
-                following: []
-            })
-            response = await newUser.save()
-            return response
+            const url = await this.s3.read(`${this.#s3FolderName}/6d22678d17f308db6083bd41f3af12051f594f3e6dca4ef08b9b5f19f33a7468`)
+            console.log(url);
         } catch (err) {
-            console.log(`Failed to upsert user ---> ${user.id}` , err)
-            throw err
+            console.log(err);
+            
         }
+    }
+    async test(fileData: FileData) {
+        await this.s3.put(fileData, this.#s3FolderName)
     }
 }
