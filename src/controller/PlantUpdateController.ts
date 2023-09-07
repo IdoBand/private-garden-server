@@ -36,7 +36,7 @@ export class PlantUpdateController extends AbstractController {
   editPlantUpdate = async (req: Request, res: Response) => {
     const files = req.files as Express.Multer.File[]; 
     const filesData = this.decideMultipleFilesData(files)
-    console.log(filesData);
+
     try {
       const newUpdateId = await this.updateDao.edit(JSON.parse(req.body.plantUpdate), filesData)
       res.status(200).send(JSON.stringify({success: true, message: 'Update added successfully!', data: newUpdateId}))
