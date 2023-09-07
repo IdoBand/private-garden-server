@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import { Comment } from "./types";
 const PlantSchema = new mongoose.Schema({
     plantName: String,
     dateAdded: Date,

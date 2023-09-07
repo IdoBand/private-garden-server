@@ -60,6 +60,7 @@ export class UserDao extends AbstractDao {
                     followers: [],
                     following: []
                 }
+
                 response = await this.add(newUser)
             }
             return response

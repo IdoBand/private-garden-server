@@ -20,6 +20,7 @@ export class PostController extends AbstractController{
     this.router.post('/', upload.array('postImages'), this.addPost)
     this.router.post('/like', this.like)
     this.router.get('/delete/:id', this.deletePost)
+    this.router.patch('/', upload.array('postImages'), this.editPost)
   }
   getRouter() {
     return this.router
@@ -72,6 +73,7 @@ export class PostController extends AbstractController{
       }
       res.status(200).send(JSON.stringify(response))
     } catch (err) {
+      console.log(err);
       res.status(500).send(JSON.stringify({message: 'Failed to add post.'}))
     }
   }
@@ -109,4 +111,21 @@ export class PostController extends AbstractController{
       res.status(500).send(JSON.stringify({message: 'Failed to delete post.'}))
     }
   }
+  editPost = async (req: Request, res: Response) => {
+    const files = req.files as Express.Multer.File[];
+    const filesData = this.decideMultipleFilesData(files)
+
+    try {
+      const result = await this.postDao.editPost(JSON.parse(req.body.post), filesData)
+      const response = {
+        success: true,
+        message: '',
+        data: result
+      }
+      res.status(200).send(JSON.stringify(response))
+    } catch (err) {
+      console.log(err);
+      res.status(500).send(JSON.stringify({message: 'Failed to edit post.'}))
+    }
+  } 
 }

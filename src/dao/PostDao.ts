@@ -110,4 +110,19 @@ export class PostDao extends AbstractDao {
             throw err
         }
     }
+    async editPost(post: Partial<Post>, filesData: FileData[]) {
+        try {
+            const exitingPost = await this.#model.findById(post._id)
+            if (exitingPost.images.length > 0) {
+                const deleteFromS3Bucket = await this.s3.deleteMultiple(exitingPost.images, this.#s3FolderName)
+            }
+            const imageNames = await this.s3.putMultiple(filesData, this.#s3FolderName)
+            post.images = imageNames
+            const response = await this.#model.findByIdAndUpdate(post._id, post)
+            return response
+        } catch (err) {
+            console.log(`Failed to edit post ${post._id}` + err)
+            throw err
+        }
+    }
 }

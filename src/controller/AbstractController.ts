@@ -12,6 +12,9 @@ export abstract class AbstractController {
         return fileData
     }
     decideMultipleFilesData(files: Express.Multer.File[]) {
-        return files.map(file => {return this.decideFileData(file)})
+        if (files) {
+            return files.map(file => {return this.decideFileData(file)})
+        }
+        return []
     }
 }
