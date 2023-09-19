@@ -40,20 +40,14 @@ export class PlantDao extends AbstractDao {
     }
     async edit(plantEdit: Plant, fileData: FileData) {
         const plantId = plantEdit._id
-        let imgName = ''
         try {
             const existingPlant = await this.#model.findById(plantId)
             if (existingPlant.img) {
-                // take exiting name in order to overwrite it in s3 bucket
-                imgName = existingPlant.img
-                if (fileData.buffer) {
-                    // overwrite the image in s3 bucket only if the user sent a new one
-                    await this.s3.put(fileData, this.#s3FolderName, imgName)
-                }
-            } else {
-                // no existing image --> generate a new Name and save it or return an empty string
-                imgName = await this.decideImageFile(fileData, this.#s3FolderName)
+                const imgPath = this.generateImagePath(existingPlant.img)
+                const deleteFromS3BuCKET = await this.s3.delete(imgPath)
             }
+            const imgName = await this.decideImageFile(fileData, this.#s3FolderName)
+            
             plantEdit.img = imgName
             const response = await PlantModel.findByIdAndUpdate(plantId, plantEdit)
             return response
