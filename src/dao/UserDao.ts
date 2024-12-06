@@ -31,7 +31,7 @@ export class UserDao extends AbstractDao {
             throw err
         }
     }
-    async handleSignIn(user: User, fileData: FileData) {
+    async handleSignIn(user: User, fileData: FileData | string) {
         let response
 
         try {
@@ -50,7 +50,7 @@ export class UserDao extends AbstractDao {
             } else {
                 console.log('suppose to add:', user);
 
-                const decideProfileImg = await this.decideImageFile(fileData ,this.#s3FolderName)
+                const decideProfileImg = await this.decideImageFile(fileData as FileData,this.#s3FolderName)
                 
                 const newUser = {
                     ...user,
@@ -96,8 +96,5 @@ export class UserDao extends AbstractDao {
             console.log(err);
             
         }
-    }
-    async test(fileData: FileData) {
-        await this.s3.put(fileData, this.#s3FolderName)
     }
 }

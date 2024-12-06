@@ -4,8 +4,8 @@ import { UserDao } from '../dao/UserDao';
 import { upload } from '../multerStorageConfig';
 
 export class UserController extends AbstractController {
-  userDao: UserDao
-  router: Router
+  private userDao: UserDao
+  private router: Router
 
   constructor() {
     super()
@@ -14,26 +14,12 @@ export class UserController extends AbstractController {
     this.setRoutes()
   }
   setRoutes() {
-    this.router.post('/test', upload.single('profileImg'), this.getTest);
     this.router.post('/', upload.single('profileImg'), this.handleSignIn);
   }
   getRouter() {
     return this.router
   }
-  getTest = async (req: Request, res: Response) => {
-    const fileData = this.decideFileData(req.file)
-    try {
-      const result = await this.userDao.test(fileData)
-      const response = {
-        success: true,
-        message: '',
-        data: result
-      }
-      res.status(200).send(JSON.stringify(response))
-    } catch (err) {
-      res.status(500).send(JSON.stringify({message: 'test failed'}))
-    }
-  }
+
   handleSignIn = async (req: Request, res: Response) => {
     const fileData = this.decideFileData(req.file)
     try {
