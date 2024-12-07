@@ -35,11 +35,9 @@ jobs:
           # Move to the project root directory
           cd /home/ubuntu/private-garden-server
           
-          # Pull the latest changes
+          # Pull the latest changes & install dependencies
           git stash
           git pull origin main
-          
-          # Install dependencies
           npm install
           
           # Start a new detached screen session with a name
