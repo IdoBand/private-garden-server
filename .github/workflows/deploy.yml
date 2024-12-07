@@ -28,13 +28,22 @@ jobs:
         script: |
           export NVM_DIR=~/.nvm
           source ~/.nvm/nvm.sh
+          
+          # Terminate the existing screen session if it exists
+          screen -S private-garden-server-screen -X quit || echo "No existing screen session to terminate."
+          
+          # Move to the project root directory
           cd /home/ubuntu/private-garden-server
+          
+          # Pull the latest changes
           git stash
           git pull origin main
+          
+          # Install dependencies
           npm install
-          sudo pm2 restart 1
-          sudo pm2 save
-          sudo pm2 startup
+          
+          # Start a new detached screen session with a name
+          screen -dmS private-garden-server-screen bash -c "npm start"
               
     - name: Remove Github Actions IP from security group
       run: |
