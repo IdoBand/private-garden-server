@@ -1,13 +1,10 @@
 import mongoose from "mongoose";
-
+import { Comment } from "./types";
 const PlantSchema = new mongoose.Schema({
     plantName: String,
     dateAdded: Date,
     userId: String,
-    img: {
-      data: Buffer,
-      contentType: String,
-    },
+    img: String,
   });
 
 export const PlantModel = mongoose.model<typeof PlantSchema>('PlantModel', PlantSchema, 'plants')
@@ -17,10 +14,7 @@ const PlantUpdateSchema = new mongoose.Schema({
   userId: String,
   dateAdded: Date,
   notes: String,
-  images: [{
-    data: Buffer,
-    contentType: String,
-  }],
+  images: [String],
   irrigation: {
     boolean: Boolean,
     waterQuantity: Number,
@@ -32,17 +26,32 @@ const PlantUpdateSchema = new mongoose.Schema({
 export const PlantUpdateModel = mongoose.model<typeof PlantUpdateSchema>('PlantUpdate', PlantUpdateSchema, 'updates')
 
 const UserSchema = new mongoose.Schema({
-  id: {type: String , unique: true},
+  id: String,
   firstName: String,
-  LastName: String,
+  lastName: String,
   dateAdded: Date,
   lastActive: Date,
-  // profileImg: {
-  //   data: Buffer,
-  //   contentType: String,
-  // },
+  profileImg: String,
   followers: [String],
   following: [String],
 });
 
 export const UserModel = mongoose.model<typeof UserSchema>('UserModel', UserSchema, 'users')
+
+const PostSchema = new mongoose.Schema({
+  userId: String,
+  images: [String],
+  dateAdded: Date,
+  text: String,
+  comments: [String],
+});
+
+export const PostModel = mongoose.model<typeof PostSchema>('PostModel', PostSchema, 'posts')
+
+const LikeSchema = new mongoose.Schema({
+  userId: String,
+  postId: String,
+  dateAdded: Date,
+});
+
+export const LikeModel = mongoose.model<typeof LikeSchema>('LikeModel', LikeSchema, 'likes')

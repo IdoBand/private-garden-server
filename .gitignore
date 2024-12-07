@@ -24,5 +24,5 @@ ideas
 /.pnp
 .pnp.js
 
-private-garden-server-key
-private-garden-server-key.pem
+private-garden-ec2-key
+private-garden-ec2-key.pem

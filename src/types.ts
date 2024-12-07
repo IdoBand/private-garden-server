@@ -1,13 +1,9 @@
-export interface PlantEdit {
-    plantName?: string,
-    img?: string | { data: Buffer | []; contentType: string }
-}
 export interface PlantUpdate {
     _id?: string
     userId?: string
     plantId?: string
     dateAdded?: string
-    images?: string[] | { data: Buffer | []; contentType: string }[]
+    images?: string[]
     irrigation?: Irrigation
     notes?: string
 }
@@ -17,13 +13,12 @@ export interface Irrigation {
     fertilizer?: string
     fertilizerQuantity?: number
 }
-
 export interface Plant {
     _id?: string
     userId: string
     plantName: string
     dateAdded: Date
-    img?: { data: Buffer | []; contentType: string }
+    img: string
 }
 export interface User {
     id: string
@@ -31,13 +26,38 @@ export interface User {
     lastName: string
     dateAdded?: Date
     lastActive?: Date
-    profileImg?: string | { data: Buffer | []; contentType: string }
+    profileImg?: string
     followers?: string[],
     following?: string[]
 }
-
 export interface responseObject {
     success: boolean
     message: string
     data?: any
+}
+export type Post = {
+    _id?: string,
+    userId: string,
+    images: string[]
+    dateAdded: Date
+    text: string
+    likes: number
+    comments: Comment[]
+    userName?: string
+    profileImg?: string
+    didUserLike?: boolean
+}
+export type Like = {
+    userId: string
+    postId: string
+    dateAdded: Date
+}
+export type Comment = {
+    userId: string
+    text: string
+    dateAdded: Date
+}
+export type FileData = {
+    buffer: Buffer | undefined
+    mimetype: string
 }
